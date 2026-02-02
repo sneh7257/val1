@@ -3,68 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Just a question 🌸</title>
+  <title>Just a question 💗</title>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
+    :root {
+      --pink: #ff3b7a;
+      --pink-dark: #ff1f68;
+      --soft: #fff5f9;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
       display: grid;
       place-items: center;
-      background: radial-gradient(circle at top, #ffeef6, #ffd6e7);
       font-family: system-ui, sans-serif;
+      background: linear-gradient(120deg, #ffeef6, #ffd6e7, #fff1f7);
+      background-size: 300% 300%;
+      animation: bgMove 10s ease infinite;
       padding: 16px;
     }
 
+    @keyframes bgMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     .card {
-      max-width: 520px;
-      background: #ffffffcc;
-      backdrop-filter: blur(10px);
-      border-radius: 22px;
-      padding: 28px;
+      width: 100%;
+      max-width: 560px;
+      background: rgba(255,255,255,.75);
+      backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: clamp(22px, 4vw, 36px);
       text-align: center;
-      box-shadow: 0 18px 60px rgba(0,0,0,.15);
+      box-shadow: 0 30px 80px rgba(0,0,0,.18);
+      animation: popIn .6s ease;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(20px) scale(.96); }
+      to { opacity: 1; transform: none; }
     }
 
     h1 {
-      font-size: clamp(24px, 4vw, 36px);
-      margin-bottom: 14px;
+      font-size: clamp(26px, 5vw, 40px);
+      margin-bottom: 12px;
     }
 
     p {
-      font-size: 16px;
-      opacity: 0.85;
-      margin-bottom: 26px;
+      font-size: clamp(15px, 2.8vw, 17px);
+      opacity: .85;
+      line-height: 1.5;
+      margin-bottom: 28px;
     }
 
     .buttons {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       justify-content: center;
       flex-wrap: wrap;
     }
 
     button {
-      padding: 14px 24px;
+      padding: 14px 26px;
       font-size: 16px;
       font-weight: 700;
       border-radius: 999px;
       border: none;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.14);
-      transition: transform .12s ease, background .12s ease;
+      min-width: 160px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.15);
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    button:active {
+      transform: scale(.96);
     }
 
     #yesBtn {
-      background: #ff3b7a;
+      background: var(--pink);
       color: white;
     }
 
     #yesBtn:hover {
-      background: #ff1f68;
+      background: var(--pink-dark);
       transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(255,59,122,.45);
     }
 
     #noBtn {
@@ -72,25 +102,58 @@
       color: #111827;
     }
 
-    #result {
-      display: none;
-      margin-top: 24px;
-      animation: pop .35s ease;
+    #noBtn:hover {
+      background: #d1d5db;
+      transform: translateY(-1px);
     }
 
-    @keyframes pop {
-      from { transform: scale(.96); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    #result {
+      display: none;
+      margin-top: 26px;
+      animation: fadeUp .4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      font-size: 18px;
+      opacity: .25;
+      animation: floatUp linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0); }
+      to { transform: translateY(-120vh); }
     }
   </style>
 </head>
 
 <body>
+
+  <!-- Floating hearts -->
+  <script>
+    for (let i = 0; i < 12; i++) {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = "💗";
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.animationDuration = 8 + Math.random() * 6 + "s";
+      h.style.animationDelay = Math.random() * 6 + "s";
+      document.body.appendChild(h);
+    }
+  </script>
+
   <main class="card">
-    <h1>Khushi, will you be my Valentine? 🌷</h1>
+    <h1>Khushi, will you be my Valentine?</h1>
 
     <p>
-      I’ve really enjoyed our walks, conversations, and time together.  
+      I’ve genuinely enjoyed our walks, laughs, and conversations.  
       No pressure at all — I just wanted to ask you honestly.
     </p>
 
@@ -101,7 +164,7 @@
 
     <div id="result">
       <h2>That made my day ✨</h2>
-      <p>Looking forward to making it special.</p>
+      <p>I’m really looking forward to it.</p>
     </div>
   </main>
 
@@ -113,8 +176,9 @@
     yesBtn.addEventListener("click", () => {
       result.style.display = "block";
       confetti({
-        particleCount: 200,
+        particleCount: 220,
         spread: 120,
+        startVelocity: 45,
         origin: { y: 0.6 }
       });
     });
@@ -123,8 +187,10 @@
       alert("Totally okay 😊 Thanks for being honest.");
     });
   </script>
+
 </body>
 </html>
+
 
 
 
