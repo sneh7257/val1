@@ -53,7 +53,7 @@ body{
 
 .card{
   width:100%;
-  max-width:700px;
+  max-width:720px;
   background:rgba(255,255,255,.86);
   backdrop-filter:blur(16px);
   border-radius:32px;
@@ -61,18 +61,12 @@ body{
   text-align:center;
   box-shadow:0 36px 110px rgba(0,0,0,.18);
   z-index:1;
-  animation:enter .7s ease;
-}
-
-@keyframes enter{
-  from{opacity:0;transform:translateY(24px) scale(.96)}
-  to{opacity:1;transform:none}
 }
 
 h1{
   font-family:'Dancing Script', cursive;
-  font-size:clamp(38px,6vw,56px);
-  margin-bottom:4px;
+  font-size:clamp(40px,6vw,58px);
+  margin-bottom:6px;
 }
 
 .decor{
@@ -86,13 +80,19 @@ h1{
   font-size:clamp(17px,3vw,19px);
   line-height:1.7;
   opacity:.9;
-  min-height:6em;
-  transition:.4s ease;
+  min-height:7.5em;
+}
+
+.question{
+  font-family:'Playfair Display', serif;
+  font-size:clamp(18px,3.2vw,21px);
+  margin-top:14px;
+  font-weight:600;
 }
 
 .zone{
   position:relative;
-  height:190px;
+  height:200px;
   margin-top:34px;
 }
 
@@ -100,7 +100,7 @@ button{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  padding:16px 34px;
+  padding:16px 36px;
   font-size:17px;
   font-weight:600;
   border-radius:999px;
@@ -112,7 +112,7 @@ button{
 }
 
 #yes{
-  left:18%;
+  left:16%;
   background:var(--pink);
   color:#fff;
 }
@@ -123,7 +123,7 @@ button{
 }
 
 #no{
-  left:60%;
+  left:62%;
   background:#eceff3;
   color:#111827;
 }
@@ -139,19 +139,13 @@ small{
 .result{
   display:none;
   margin-top:30px;
-  animation:fade .45s ease;
-}
-
-@keyframes fade{
-  from{opacity:0;transform:scale(.96)}
-  to{opacity:1;transform:none}
 }
 </style>
 </head>
 
 <body>
 
-<!-- floating hearts generator -->
+<!-- floating hearts -->
 <script>
 for(let i=0;i<14;i++){
   const h=document.createElement("div");
@@ -168,19 +162,20 @@ for(let i=0;i<14;i++){
   <h1>Khushi</h1>
   <div class="decor">❦ ✦ ✿ ✦ ❦</div>
 
-  <p id="story">
-    So… this might be slightly obvious by now,<br>
-    but I really like the moments we share.<br><br>
-    And before Valentine’s Day quietly passes us by,<br>
-    I wanted to ask — properly, honestly, and with a smile.
-  </p>
+  <!-- HOME PAGE TEXT -->
+  <div id="story">
+    Somewhere between the easy conversations, shared walks, and moments that quietly made my days feel lighter, this question found its place.  
+    I didn’t plan it as a grand gesture just a small, honest one because I genuinely enjoy being around you.  
+    And before Valentine’s Day slips by like any other date…
+    <div class="question">will you be my Valentine? 💗</div>
+  </div>
 
   <div class="zone" id="zone">
     <button id="yes">Yes 💖</button>
     <button id="no">No 🙈</button>
   </div>
 
-  <small id="hint">The “No” button gets a little nervous around romance.</small>
+  <small id="hint">The “No” button gets shy around cute questions.</small>
 
   <div class="result" id="result"></div>
 </main>
@@ -193,24 +188,18 @@ const story = document.getElementById("story");
 const result = document.getElementById("result");
 const hint = document.getElementById("hint");
 
-const lines = [
-  "Okay… I get it. Big questions can be intimidating.",
-  "No rush. Valentine’s Day isn’t running away (unlike this button).",
-  "Just saying — this question took some courage.",
-  "The ‘Yes’ seems surprisingly calm about all this.",
-  "I swear this is the only button that behaves like this."
-];
-
-let i = 0;
 let yesScale = 1;
 let hasAnswered = false;
-let lastLineChange = 0;
-const LINE_DELAY = 1000; // 1 second
+let lastMove = 0;
+const MOVE_DELAY = 500;
 
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 
 function moveNo(x,y){
   if(hasAnswered) return;
+  const now = Date.now();
+  if(now - lastMove < MOVE_DELAY) return;
+  lastMove = now;
 
   const z = zone.getBoundingClientRect();
   const b = no.getBoundingClientRect();
@@ -220,26 +209,20 @@ function moveNo(x,y){
   let mag = Math.hypot(dx,dy) || 1;
   dx /= mag; dy /= mag;
 
-  let left = (b.left - z.left) + dx * 140;
-  let top  = (b.top  - z.top ) + dy * 140;
+  let left = (b.left - z.left) + dx * 160;
+  let top  = (b.top  - z.top ) + dy * 160;
 
   no.style.left = clamp(left,0,z.width-b.width) + "px";
   no.style.top  = clamp(top ,0,z.height-b.height) + "px";
   no.style.transform = "none";
 
-  const now = Date.now();
-  if(now - lastLineChange > LINE_DELAY){
-    story.textContent = lines[i++ % lines.length];
-    lastLineChange = now;
-  }
-
   yesScale = Math.min(2.1, yesScale + 0.06);
   yes.style.transform = `translateY(-50%) scale(${yesScale})`;
 }
 
+/* Desktop hover */
 zone.addEventListener("pointermove", e=>{
-  if(hasAnswered) return;
-
+  if(hasAnswered || e.pointerType !== "mouse") return;
   const b = no.getBoundingClientRect();
   const d = Math.hypot(
     (b.left + b.width/2) - e.clientX,
@@ -248,25 +231,30 @@ zone.addEventListener("pointermove", e=>{
   if(d < 140) moveNo(e.clientX, e.clientY);
 });
 
-no.addEventListener("click", e=>e.preventDefault());
+/* Mobile tap */
+no.addEventListener("pointerdown", e=>{
+  if(hasAnswered || e.pointerType !== "touch") return;
+  e.preventDefault();
+  moveNo(e.clientX, e.clientY);
+});
 
 yes.addEventListener("click", ()=>{
   hasAnswered = true;
-
   zone.style.display = "none";
   hint.style.display = "none";
 
   story.innerHTML = `
     <strong>You just made my Valentine ✨</strong><br><br>
-    I promise good company, easy smiles,<br>
-    and a day that feels warm, light,<br>
-    and a little special — just like this moment 💖
+    Thank you for saying yes. That genuinely made me smile.<br>
+    I promise good company, warm laughs, unforced smiles,<br>
+    and a day that feels easy, happy, and a little special.<br><br>
+    <em>PS: This was easier to code than to ask.</em> 💗
   `;
 
   result.style.display = "block";
 
   confetti({
-    particleCount:280,
+    particleCount:300,
     spread:130,
     startVelocity:45,
     origin:{y:.6}
@@ -276,12 +264,3 @@ yes.addEventListener("click", ()=>{
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
