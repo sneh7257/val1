@@ -182,25 +182,18 @@ for(let i=0;i<14;i++){
 
   <small id="hint">The “No” button gets a little nervous around romance.</small>
 
-  <div class="result" id="result">
-    <h2 style="font-family:'Dancing Script',cursive;font-size:40px;">
-      You just made my Valentine ✨
-    </h2>
-    <p style="font-family:'Playfair Display',serif;">
-      I promise good company, easy smiles, and a lovely day.
-    </p>
-  </div>
+  <div class="result" id="result"></div>
 </main>
 
 <script>
-const zone=document.getElementById("zone");
-const no=document.getElementById("no");
-const yes=document.getElementById("yes");
-const story=document.getElementById("story");
-const result=document.getElementById("result");
-const hint=document.getElementById("hint");
+const zone = document.getElementById("zone");
+const no = document.getElementById("no");
+const yes = document.getElementById("yes");
+const story = document.getElementById("story");
+const result = document.getElementById("result");
+const hint = document.getElementById("hint");
 
-const lines=[
+const lines = [
   "Okay… I get it. Big questions can be intimidating.",
   "No rush. Valentine’s Day isn’t running away (unlike this button).",
   "Just saying — this question took some courage.",
@@ -208,53 +201,82 @@ const lines=[
   "I swear this is the only button that behaves like this."
 ];
 
-let i=0, yesScale=1;
+let i = 0;
+let yesScale = 1;
+let hasAnswered = false;
+let lastLineChange = 0;
+const LINE_DELAY = 1000; // 1 second
 
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 
 function moveNo(x,y){
-  const z=zone.getBoundingClientRect();
-  const b=no.getBoundingClientRect();
+  if(hasAnswered) return;
 
-  let dx=(b.left+b.width/2)-x;
-  let dy=(b.top+b.height/2)-y;
-  let m=Math.hypot(dx,dy)||1;
-  dx/=m; dy/=m;
+  const z = zone.getBoundingClientRect();
+  const b = no.getBoundingClientRect();
 
-  let l=(b.left-z.left)+dx*140;
-  let t=(b.top-z.top)+dy*140;
+  let dx = (b.left + b.width/2) - x;
+  let dy = (b.top  + b.height/2) - y;
+  let mag = Math.hypot(dx,dy) || 1;
+  dx /= mag; dy /= mag;
 
-  no.style.left=clamp(l,0,z.width-b.width)+"px";
-  no.style.top =clamp(t,0,z.height-b.height)+"px";
-  no.style.transform="none";
+  let left = (b.left - z.left) + dx * 140;
+  let top  = (b.top  - z.top ) + dy * 140;
 
-  story.textContent=lines[i++%lines.length];
+  no.style.left = clamp(left,0,z.width-b.width) + "px";
+  no.style.top  = clamp(top ,0,z.height-b.height) + "px";
+  no.style.transform = "none";
 
-  yesScale=Math.min(2.1,yesScale+.06);
-  yes.style.transform=`translateY(-50%) scale(${yesScale})`;
+  const now = Date.now();
+  if(now - lastLineChange > LINE_DELAY){
+    story.textContent = lines[i++ % lines.length];
+    lastLineChange = now;
+  }
+
+  yesScale = Math.min(2.1, yesScale + 0.06);
+  yes.style.transform = `translateY(-50%) scale(${yesScale})`;
 }
 
-zone.addEventListener("pointermove",e=>{
-  const b=no.getBoundingClientRect();
-  const d=Math.hypot(
-    (b.left+b.width/2)-e.clientX,
-    (b.top+b.height/2)-e.clientY
+zone.addEventListener("pointermove", e=>{
+  if(hasAnswered) return;
+
+  const b = no.getBoundingClientRect();
+  const d = Math.hypot(
+    (b.left + b.width/2) - e.clientX,
+    (b.top  + b.height/2) - e.clientY
   );
-  if(d<140) moveNo(e.clientX,e.clientY);
+  if(d < 140) moveNo(e.clientX, e.clientY);
 });
 
-no.addEventListener("click",e=>e.preventDefault());
+no.addEventListener("click", e=>e.preventDefault());
 
-yes.addEventListener("click",()=>{
-  zone.style.display="none";
-  hint.style.display="none";
-  result.style.display="block";
-  confetti({particleCount:280,spread:130,origin:{y:.6}});
+yes.addEventListener("click", ()=>{
+  hasAnswered = true;
+
+  zone.style.display = "none";
+  hint.style.display = "none";
+
+  story.innerHTML = `
+    <strong>You just made my Valentine ✨</strong><br><br>
+    I promise good company, easy smiles,<br>
+    and a day that feels warm, light,<br>
+    and a little special — just like this moment 💖
+  `;
+
+  result.style.display = "block";
+
+  confetti({
+    particleCount:280,
+    spread:130,
+    startVelocity:45,
+    origin:{y:.6}
+  });
 });
 </script>
 
 </body>
 </html>
+
 
 
 
