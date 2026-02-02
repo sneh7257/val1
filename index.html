@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Something I wanted to ask 💗</title>
+<title>Will you be my Valentine? 💗</title>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@500;600&display=swap');
+
 :root{
   --pink:#ff4d88;
   --pinkDark:#ff2f73;
@@ -25,6 +27,7 @@ body{
   animation:bg 14s ease infinite;
   font-family:system-ui,sans-serif;
   padding:16px;
+  overflow:hidden;
 }
 
 @keyframes bg{
@@ -33,15 +36,31 @@ body{
   100%{background-position:0% 50%}
 }
 
+/* floating hearts */
+.heart{
+  position:fixed;
+  bottom:-20px;
+  font-size:18px;
+  opacity:.25;
+  animation:floatUp linear infinite;
+  pointer-events:none;
+}
+
+@keyframes floatUp{
+  from{transform:translateY(0)}
+  to{transform:translateY(-120vh)}
+}
+
 .card{
   width:100%;
-  max-width:640px;
-  background:rgba(255,255,255,.82);
+  max-width:700px;
+  background:rgba(255,255,255,.86);
   backdrop-filter:blur(16px);
-  border-radius:28px;
-  padding:clamp(24px,4vw,42px);
+  border-radius:32px;
+  padding:clamp(26px,4vw,46px);
   text-align:center;
-  box-shadow:0 32px 90px rgba(0,0,0,.18);
+  box-shadow:0 36px 110px rgba(0,0,0,.18);
+  z-index:1;
   animation:enter .7s ease;
 }
 
@@ -51,35 +70,44 @@ body{
 }
 
 h1{
-  font-size:clamp(28px,5vw,44px);
-  margin-bottom:12px;
+  font-family:'Dancing Script', cursive;
+  font-size:clamp(38px,6vw,56px);
+  margin-bottom:4px;
+}
+
+.decor{
+  font-size:18px;
+  opacity:.6;
+  margin-bottom:18px;
 }
 
 #story{
-  font-size:clamp(16px,3vw,18px);
-  line-height:1.6;
-  opacity:.85;
-  min-height:4em;
-  transition:.35s ease;
+  font-family:'Playfair Display', serif;
+  font-size:clamp(17px,3vw,19px);
+  line-height:1.7;
+  opacity:.9;
+  min-height:6em;
+  transition:.4s ease;
 }
 
 .zone{
   position:relative;
-  height:170px;
-  margin-top:30px;
+  height:190px;
+  margin-top:34px;
 }
 
 button{
   position:absolute;
   top:50%;
   transform:translateY(-50%);
-  padding:16px 30px;
+  padding:16px 34px;
   font-size:17px;
-  font-weight:700;
+  font-weight:600;
   border-radius:999px;
   border:none;
   cursor:pointer;
-  box-shadow:0 16px 32px rgba(0,0,0,.16);
+  font-family:'Playfair Display', serif;
+  box-shadow:0 16px 34px rgba(0,0,0,.16);
   transition:transform .18s ease, background .18s ease;
 }
 
@@ -100,35 +128,51 @@ button{
   color:#111827;
 }
 
-.result{
-  display:none;
-  margin-top:28px;
-  animation:softPop .45s ease;
-}
-
-@keyframes softPop{
-  from{opacity:0;transform:scale(.96)}
-  to{opacity:1;transform:none}
-}
-
 small{
   display:block;
-  margin-top:12px;
-  opacity:.55;
+  margin-top:14px;
+  opacity:.6;
   font-style:italic;
+  font-family:'Playfair Display', serif;
+}
+
+.result{
+  display:none;
+  margin-top:30px;
+  animation:fade .45s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:scale(.96)}
+  to{opacity:1;transform:none}
 }
 </style>
 </head>
 
 <body>
 
+<!-- floating hearts generator -->
+<script>
+for(let i=0;i<14;i++){
+  const h=document.createElement("div");
+  h.className="heart";
+  h.textContent="💗";
+  h.style.left=Math.random()*100+"vw";
+  h.style.animationDuration=8+Math.random()*6+"s";
+  h.style.animationDelay=Math.random()*6+"s";
+  document.body.appendChild(h);
+}
+</script>
+
 <main class="card">
-  <h1>Khushi 🌷</h1>
+  <h1>Khushi</h1>
+  <div class="decor">❦ ✦ ✿ ✦ ❦</div>
 
   <p id="story">
-    Somewhere between our conversations,<br>
-    our walks, and those quiet smiles…<br>
-    this question started feeling right.
+    So… this might be slightly obvious by now,<br>
+    but I really like the moments we share.<br><br>
+    And before Valentine’s Day quietly passes us by,<br>
+    I wanted to ask — properly, honestly, and with a smile.
   </p>
 
   <div class="zone" id="zone">
@@ -136,61 +180,61 @@ small{
     <button id="no">No 🙈</button>
   </div>
 
-  <small id="hint">Some feelings take a moment to settle.</small>
+  <small id="hint">The “No” button gets a little nervous around romance.</small>
 
   <div class="result" id="result">
-    <h2>I’m really glad it’s you ✨</h2>
-    <p>This just became my favorite answer.</p>
+    <h2 style="font-family:'Dancing Script',cursive;font-size:40px;">
+      You just made my Valentine ✨
+    </h2>
+    <p style="font-family:'Playfair Display',serif;">
+      I promise good company, easy smiles, and a lovely day.
+    </p>
   </div>
 </main>
 
 <script>
-const zone = document.getElementById("zone");
-const no = document.getElementById("no");
-const yes = document.getElementById("yes");
-const story = document.getElementById("story");
-const result = document.getElementById("result");
-const hint = document.getElementById("hint");
+const zone=document.getElementById("zone");
+const no=document.getElementById("no");
+const yes=document.getElementById("yes");
+const story=document.getElementById("story");
+const result=document.getElementById("result");
+const hint=document.getElementById("hint");
 
-const thoughts = [
-  "It’s okay to pause… some questions deserve that.",
-  "Not everything has to be rushed.",
-  "Sometimes the heart hesitates before it smiles.",
-  "Whatever you choose, I’m glad I asked.",
-  "Some moments feel better when they linger."
+const lines=[
+  "Okay… I get it. Big questions can be intimidating.",
+  "No rush. Valentine’s Day isn’t running away (unlike this button).",
+  "Just saying — this question took some courage.",
+  "The ‘Yes’ seems surprisingly calm about all this.",
+  "I swear this is the only button that behaves like this."
 ];
 
-let i = 0;
-let yesScale = 1;
+let i=0, yesScale=1;
 
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 
 function moveNo(x,y){
-  const z = zone.getBoundingClientRect();
-  const b = no.getBoundingClientRect();
+  const z=zone.getBoundingClientRect();
+  const b=no.getBoundingClientRect();
 
-  let dx = (b.left+b.width/2)-x;
-  let dy = (b.top+b.height/2)-y;
-  let mag = Math.hypot(dx,dy)||1;
-  dx/=mag; dy/=mag;
+  let dx=(b.left+b.width/2)-x;
+  let dy=(b.top+b.height/2)-y;
+  let m=Math.hypot(dx,dy)||1;
+  dx/=m; dy/=m;
 
-  let left = (b.left-z.left)+dx*140;
-  let top  = (b.top -z.top )+dy*140;
+  let l=(b.left-z.left)+dx*140;
+  let t=(b.top-z.top)+dy*140;
 
-  left = clamp(left,0,z.width-b.width);
-  top  = clamp(top ,0,z.height-b.height);
+  no.style.left=clamp(l,0,z.width-b.width)+"px";
+  no.style.top =clamp(t,0,z.height-b.height)+"px";
+  no.style.transform="none";
 
-  no.style.left = left+"px";
-  no.style.top  = top +"px";
-  no.style.transform = "none";
+  story.textContent=lines[i++%lines.length];
 
-  story.textContent = thoughts[i++ % thoughts.length];
-
-  yesScale = Math.min(2.1, yesScale + .07);
-  yes.style.transform = `translateY(-50%) scale(${yesScale})`;
+  yesScale=Math.min(2.1,yesScale+.06);
+  yes.style.transform=`translateY(-50%) scale(${yesScale})`;
 }
 
-zone.addEventListener("pointermove", e=>{
+zone.addEventListener("pointermove",e=>{
   const b=no.getBoundingClientRect();
   const d=Math.hypot(
     (b.left+b.width/2)-e.clientX,
@@ -205,18 +249,13 @@ yes.addEventListener("click",()=>{
   zone.style.display="none";
   hint.style.display="none";
   result.style.display="block";
-
-  confetti({
-    particleCount:280,
-    spread:130,
-    startVelocity:45,
-    origin:{y:.6}
-  });
+  confetti({particleCount:280,spread:130,origin:{y:.6}});
 });
 </script>
 
 </body>
 </html>
+
 
 
 
