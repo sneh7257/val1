@@ -83,7 +83,6 @@ h1{
   color:var(--text);
   opacity:.95;
   min-height:7.8em;
-  transition:.4s ease;
 }
 
 .question{
@@ -92,7 +91,15 @@ h1{
   font-size:clamp(24px,4.2vw,30px);
   font-weight:700;
   color:#3b1020;
-  letter-spacing:.3px;
+}
+
+.runaway-line{
+  margin-top:8px;
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(14px,2.6vw,16px);
+  font-style:italic;
+  opacity:.65;
+  transition:.3s ease;
 }
 
 .zone{
@@ -113,18 +120,12 @@ button{
   cursor:pointer;
   font-family:'Playfair Display', serif;
   box-shadow:0 18px 36px rgba(0,0,0,.16);
-  transition:transform .18s ease, background .18s ease;
 }
 
 #yes{
   left:15%;
   background:var(--pink);
   color:#fff;
-}
-
-#yes:hover{
-  background:var(--pinkDark);
-  transform:translateY(-50%) scale(1.06);
 }
 
 #no{
@@ -140,17 +141,11 @@ small{
   font-style:italic;
   font-family:'Cormorant Garamond', serif;
 }
-
-.result{
-  display:none;
-  margin-top:30px;
-}
 </style>
 </head>
 
 <body>
 
-<!-- floating hearts -->
 <script>
 for(let i=0;i<14;i++){
   const h=document.createElement("div");
@@ -167,12 +162,12 @@ for(let i=0;i<14;i++){
   <h1>Khushi</h1>
   <div class="decor">❦ ✦ ✿ ✦ ❦</div>
 
-  <!-- HOME PAGE TEXT -->
   <div id="story">
     Somewhere between the easy conversations, shared walks, and moments that quietly made my days feel lighter, this question found its place.  
-    I didn’t plan it as a grand gesture just a small, honest one because I genuinely enjoy being around you.  
+    I didn’t plan it as a grand gesture — just a small, honest one — because I genuinely enjoy being around you.  
     And before Valentine’s Day slips by like any other date…
-    <div class="question">will you be my Valentine? 💗</div>
+    <div class="question">Will you be my Valentine? 💗</div>
+    <div class="runaway-line" id="runawayLine"></div>
   </div>
 
   <div class="zone" id="zone">
@@ -181,112 +176,83 @@ for(let i=0;i<14;i++){
   </div>
 
   <small id="hint">The “No” button gets a little shy around romance.</small>
-
-  <div class="result" id="result"></div>
 </main>
 
 <script>
 const zone = document.getElementById("zone");
 const no = document.getElementById("no");
 const yes = document.getElementById("yes");
-const story = document.getElementById("story");
-const result = document.getElementById("result");
+const runawayLine = document.getElementById("runawayLine");
 const hint = document.getElementById("hint");
 
-/* playful runaway lines */
 const lines = [
   "Okay… I get it. Big questions can be intimidating.",
   "No rush. Valentine’s Day isn’t running away (unlike this button).",
-  "Just saying  this question took some courage.",
+  "Just saying — this question took some courage.",
   "The ‘Yes’ seems surprisingly calm about all this.",
   "I swear this is the only button that behaves like this."
 ];
 
-let i = 0;
-let yesScale = 1;
-let hasAnswered = false;
-let lastLineChange = 0;
-const LINE_DELAY = 1000; // 1 second
-let lastMove = 0;
-const MOVE_DELAY = 500;
+let i=0, yesScale=1, hasAnswered=false, lastLineChange=0, lastMove=0;
 
 function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
 
 function moveNo(x,y){
   if(hasAnswered) return;
+  const now=Date.now();
+  if(now-lastMove<500) return;
+  lastMove=now;
 
-  const now = Date.now();
-  if(now - lastMove < MOVE_DELAY) return;
-  lastMove = now;
+  const z=zone.getBoundingClientRect();
+  const b=no.getBoundingClientRect();
+  let dx=(b.left+b.width/2)-x;
+  let dy=(b.top+b.height/2)-y;
+  let m=Math.hypot(dx,dy)||1;
+  dx/=m; dy/=m;
 
-  const z = zone.getBoundingClientRect();
-  const b = no.getBoundingClientRect();
+  no.style.left=clamp((b.left-z.left)+dx*160,0,z.width-b.width)+"px";
+  no.style.top =clamp((b.top -z.top )+dy*160,0,z.height-b.height)+"px";
 
-  let dx = (b.left + b.width/2) - x;
-  let dy = (b.top  + b.height/2) - y;
-  let mag = Math.hypot(dx,dy) || 1;
-  dx /= mag; dy /= mag;
-
-  let left = (b.left - z.left) + dx * 160;
-  let top  = (b.top  - z.top ) + dy * 160;
-
-  no.style.left = clamp(left,0,z.width-b.width) + "px";
-  no.style.top  = clamp(top ,0,z.height-b.height) + "px";
-  no.style.transform = "none";
-
-  if(now - lastLineChange > LINE_DELAY){
-    story.childNodes[0].textContent = lines[i++ % lines.length];
-    lastLineChange = now;
+  if(now-lastLineChange>1000){
+    runawayLine.textContent=lines[i++%lines.length];
+    lastLineChange=now;
   }
 
-  yesScale = Math.min(2.1, yesScale + 0.06);
-  yes.style.transform = `translateY(-50%) scale(${yesScale})`;
+  yesScale=Math.min(2.1,yesScale+.06);
+  yes.style.transform=`translateY(-50%) scale(${yesScale})`;
 }
 
-/* Desktop hover */
-zone.addEventListener("pointermove", e=>{
-  if(hasAnswered || e.pointerType !== "mouse") return;
-  const b = no.getBoundingClientRect();
-  const d = Math.hypot(
-    (b.left + b.width/2) - e.clientX,
-    (b.top  + b.height/2) - e.clientY
-  );
-  if(d < 140) moveNo(e.clientX, e.clientY);
+zone.addEventListener("pointermove",e=>{
+  if(hasAnswered||e.pointerType!=="mouse") return;
+  const b=no.getBoundingClientRect();
+  if(Math.hypot((b.left+b.width/2)-e.clientX,(b.top+b.height/2)-e.clientY)<140)
+    moveNo(e.clientX,e.clientY);
 });
 
-/* Mobile tap */
-no.addEventListener("pointerdown", e=>{
-  if(hasAnswered || e.pointerType !== "touch") return;
+no.addEventListener("pointerdown",e=>{
+  if(hasAnswered||e.pointerType!=="touch") return;
   e.preventDefault();
-  moveNo(e.clientX, e.clientY);
+  moveNo(e.clientX,e.clientY);
 });
 
-yes.addEventListener("click", ()=>{
-  hasAnswered = true;
-
-  zone.style.display = "none";
-  hint.style.display = "none";
-
-  story.innerHTML = `
+yes.addEventListener("click",()=>{
+  hasAnswered=true;
+  zone.style.display="none";
+  hint.style.display="none";
+  runawayLine.textContent="";
+  document.getElementById("story").innerHTML=`
     <strong>You just made my Valentine ✨</strong><br><br>
     Thank you for saying yes. That genuinely made me smile.<br>
     I promise good company, warm laughs, unforced smiles,<br>
     and a day that feels easy, happy, and a little special.<br><br>
     <em>PS: This was easier to code than to ask.</em> 💗
   `;
-
-  result.style.display = "block";
-
-  confetti({
-    particleCount:300,
-    spread:130,
-    startVelocity:45,
-    origin:{y:.6}
-  });
+  confetti({particleCount:300,spread:130,origin:{y:.6}});
 });
 </script>
 
 </body>
 </html>
+
 
 
